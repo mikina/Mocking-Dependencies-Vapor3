@@ -10,25 +10,18 @@ final class AvailabilityController {
   }
   
   func checkAvailability(_ req: Request) throws -> Future<Response> {
-    let promise = req.eventLoop.newPromise(Response.self)
     availabilityChecker.req = req
     
     let productID = try req.parameters.next(UUID.self)
     let quantity = try req.parameters.next(Int.self)
     
-    DispatchQueue.global().async {
-      do {
-        let productDetails = try self.availabilityChecker.checkProduct(id: productID, quantity: quantity)
-        
-        _ = productDetails.encode(status: (productDetails.quantity >= quantity ? .ok : .notFound), for: req).map {
-          promise.succeed(result: $0)
-        }
-      }
-      catch {
-        promise.fail(error: error)
+    do {
+      return try self.availabilityChecker.checkProduct(id: productID, quantity: quantity).flatMap { details in
+        return details.encode(status: (details.quantity >= quantity ? .ok : .notFound), for: req)
       }
     }
-    
-    return promise.futureResult
+    catch {
+      throw Abort(.badRequest, headers: [:], reason: error.localizedDescription)
+    }
   }
 }
