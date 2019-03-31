@@ -13,4 +13,9 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     // middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
     services.register(middlewares)
+  
+    services.register(AvailabilityCheckerProtocol.self) { container in
+      return AvailabilityChecker()
+    }
 }
+

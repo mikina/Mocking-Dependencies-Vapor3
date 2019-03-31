@@ -24,3 +24,5 @@ class AvailabilityChecker: AvailabilityCheckerProtocol {
     }
   }
 }
+
+extension AvailabilityChecker: Service {}

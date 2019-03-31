@@ -8,8 +8,11 @@ final class AvailabilityTests: XCTestCase {
   
   override func setUp() {
     super.setUp()
-    
-    app = try! Application.makeTest(routes: testRoutes)
+    app = try! Application.makeTest(configure: { (config, services) in
+      services.register(AvailabilityCheckerProtocol.self) { container in
+        return AvailabilityCheckerMock()
+      }
+    }, routes: testRoutes)
   }
   
   override func tearDown() {
@@ -19,7 +22,7 @@ final class AvailabilityTests: XCTestCase {
   }
   
   private func testRoutes(_ router: Router) throws {
-    let availabilityVC = AvailabilityController(availabilityChecker: AvailabilityCheckerMock())
+    let availabilityVC = AvailabilityController()
     router.get("status", UUID.parameter, Int.parameter,
                use: availabilityVC.checkAvailability)
   }

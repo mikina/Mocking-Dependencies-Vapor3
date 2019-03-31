@@ -27,3 +27,5 @@ class AvailabilityCheckerMock: AvailabilityCheckerProtocol {
     return request.eventLoop.newSucceededFuture(result: ProductDetailsResponse(quantity: product.quantity, status: .available))
   }
 }
+
+extension AvailabilityCheckerMock: Service {}
